@@ -25,7 +25,7 @@
 # SOFTWARE.
 
 from libqtile import bar, layout, widget
-from libqtile.config import Click, Drag, Group, Key, Match, Screen
+from libqtile.config import Click, Drag, Group, ScratchPad, DropDown, Key, Match, Screen
 from libqtile.lazy import lazy
 from libqtile.utils import guess_terminal
 import os
@@ -62,12 +62,7 @@ keys = [
     # Split = all windows displayed
     # Unsplit = 1 window displayed, like Max layout, but still with
     # multiple stack panes
-    Key(
-        [mod, "shift"],
-        "Return",
-        lazy.layout.toggle_split(),
-        desc="Toggle between split and unsplit sides of stack",
-    ),
+    Key([mod, "shift"],"Return",lazy.layout.toggle_split(),desc="Toggle between split and unsplit sides of stack"),
     Key([mod], "Return", lazy.spawn(terminal), desc="Launch terminal"),
     # Toggle between different layouts as defined below
     Key([mod], "Tab", lazy.next_layout(), desc="Toggle between layouts"),
@@ -78,9 +73,23 @@ keys = [
     Key([mod], "r", lazy.spawn("rofi -show drun"), desc="Spawn search application cmd"),
     Key([mod], "b", lazy.spawn("rofi -show"), desc="Find open app"),
     Key([mod], "e", lazy.spawn(fileManager), desc="Launch file manager"),
-    Key([mod], "s", lazy.spawn("scrot /home/dagon/Imagenes/screenshots/"), desc="Full Screenshot"),
-    Key([mod, "shift"], "s", lazy.spawn("scrot /home/dagon/Imagenes/screenshots/ -s"), desc="Area Screenshot diff"),
+    Key([mod], "s", lazy.spawn("scrot /home/dagon/Imagenes/screenshots/.png --format png"), desc="Full Screenshot"),
+    Key([mod, "shift"], "s", lazy.spawn("scrot /home/dagon/Imagenes/screenshots/.png -f -s --format png"), desc="Area Screenshot diff"),
     Key([mod], "f", lazy.window.toggle_fullscreen(), desc="Fullscreen window"),
+    #SYSTEM ACTIONS
+    Key([mod, "shift"], "r", lazy.restart()),
+    Key([mod, "shift"], "x", lazy.shutdown()),
+
+    #QTILE ACTIONS
+    Key([mod, "shift"], "space", lazy.window.toggle_floating()),
+
+    #SWITCH FOCUS TO SPECIFIC MONITOR (OUT OF THREE)
+    Key([mod], "i", lazy.to_screen(0)),
+    Key([mod], "o", lazy.to_screen(1)),
+
+    #SWITCH FOCUS OF MONITORS
+    Key([mod], "period", lazy.next_screen()),
+    Key([mod], "comma", lazy.prev_screen()),
 
     #HARDWARE CONFIGS
     Key([], "XF86AudioLowerVolume", lazy.spawn("pactl set-sink-volume @DEFAULT_SINK@ -5%")),
@@ -101,34 +110,42 @@ groups = [
     Group("", matches=[Match(wm_class=["krita", "Gcolor3", "obs"])]),
     Group(""),
     Group("", matches=[Match(wm_class=["timeshift-gtk", "Nitrogen", "Lxappearance", "nvidia-settings", "pavucontrol"])]),
-    Group("", matches=[Match(wm_class=["btop", "vmplayer"])]),
+    Group("", matches=[Match(wm_class=["btop"])]), #ANTES ESTABA "vmplayer"
 ]
 
 
 for index, i in enumerate(groups):
-    keys.extend(
-        [
-            # mod1 + letter of group = switch to group
-            Key(
-                [mod],
-                #i.name,
-                str(index+1),
-                lazy.group[i.name].toscreen(),
-                desc="Switch to group {}".format(i.name),
-            ),
-            # mod1 + shift + letter of group = switch to & move focused window to group
-            Key(
-                [mod, "shift"],
-                str(index+1),
-                lazy.window.togroup(i.name, switch_group=True),
-                desc="Switch to & move focused window to group {}".format(i.name),
-            ),
-            # Or, use below if you prefer not to switch to that group.
-            # # mod1 + shift + letter of group = move focused window to group
-            # Key([mod, "shift"], i.name, lazy.window.togroup(i.name),
-            #     desc="move focused window to group {}".format(i.name)),
-        ]
-    )
+    keys.extend([
+        # mod1 + letter of group = switch to group
+        Key([mod],str(index+1),lazy.group[i.name].toscreen(),desc="Switch to group {}".format(i.name)),
+        # mod1 + shift + letter of group = switch to & move focused window to group
+        Key([mod, "shift"],str(index+1),lazy.window.togroup(i.name, switch_group=True),desc="Switch to & move focused window to group {}".format(i.name)),
+        Key([mod], "Tab", lazy.screen.next_group(), desc="Move to next group"),
+        Key([mod, "shift"], "Tab", lazy.screen.prev_group(), desc="Move to previous group")
+        # Or, use below if you prefer not to switch to that group.
+        # # mod1 + shift + letter of group = move focused window to group
+        # Key([mod, "shift"], i.name, lazy.window.togroup(i.name),
+        #     desc="move focused window to group {}".format(i.name)),
+    ])
+
+#SCRATCHPAD CONFIGURATION
+groups.append(ScratchPad("scratchpad", [
+    DropDown("term", "alacritty --class=scratch", width=0.6, height=0.6, x=0.2, y=0.2, opacity=1),
+    DropDown("term2", "alacritty --class=scratch", width=0.6, height=0.6, x=0.2, y=0.2, opacity=1),
+    DropDown("ranger", "alacritty --class=ranger -e ranger", width=0.6, height=0.6, x=0.2, y=0.2, opacity=1),
+    DropDown("notas", "alacritty --class=notas", width=0.3, height=0.4, opacity=1),
+    DropDown("reloj", "alacritty --class=reloj", width=0.3, height=0.2, x=0.6, y=0.75, opacity=1),
+]))
+
+#SCRATCHPAD KEYBINDINGS
+keys.extend((
+  # toggle visibiliy of above defined DropDown named "term"
+  Key([mod], 'F1', lazy.group['scratchpad'].dropdown_toggle('term')),
+  Key([mod], 'F2', lazy.group['scratchpad'].dropdown_toggle('term2')),
+  Key([mod], 'F3', lazy.group['scratchpad'].dropdown_toggle('ranger')),
+  Key([mod], 'F11', lazy.group['scratchpad'].dropdown_toggle('notas')),
+  Key([mod], 'F12', lazy.group['scratchpad'].dropdown_toggle('reloj')),
+))
 
 layout_theme = {
         "border_width":2,
@@ -188,8 +205,8 @@ screens = [
     Screen(
         top=bar.Bar(
             [
-                widget.CurrentLayout(),
-                widget.TextBox("", fontsize=22),
+                #widget.CurrentLayout(),
+                #widget.TextBox("", fontsize=22),
                 widget.GroupBox(inactive=bgColors["other"], highlight_method="line"),
                 widget.TextBox("", fontsize=22),
                 widget.Prompt(),
@@ -203,8 +220,8 @@ screens = [
                 widget.TextBox("", padding=0, fontsize=45,background=bgColors["white"], foreground=bgColors["gray"]),
                 widget.TextBox("󰕾"),
                 widget.PulseVolume(update_interval=0.04),
-                widget.TextBox("", padding=0, fontsize=43),
-                widget.Battery(background=bgColors["white"], foreground=bgColors["black"], charge_char="󰢞",discharge_char="󰂀", format="{char}{percent: 0.0%}", update_interval=2),
+                widget.TextBox("", padding=0, fontsize=43), 
+                widget.Battery(background=bgColors["white"], foreground=bgColors["black"], full_char="󰂅", charge_char="󰢞",discharge_char="󰂀", unknown_char="󰂑", format="{char}{percent: 0.0%} ", update_interval=2),
                 #widget.QuickExit(),
             ],
             28,
