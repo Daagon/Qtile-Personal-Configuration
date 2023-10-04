@@ -76,6 +76,7 @@ keys = [
     Key([mod], "s", lazy.spawn("scrot /home/dagon/Imagenes/screenshots/.png --format png"), desc="Full Screenshot"),
     Key([mod, "shift"], "s", lazy.spawn("scrot /home/dagon/Imagenes/screenshots/.png -f -s --format png"), desc="Area Screenshot diff"),
     Key([mod], "f", lazy.window.toggle_fullscreen(), desc="Fullscreen window"),
+
     #SYSTEM ACTIONS
     Key([mod, "shift"], "r", lazy.restart()),
     Key([mod, "shift"], "x", lazy.shutdown()),
@@ -104,7 +105,7 @@ keys = [
 groups = [
     Group(""),
     Group("", matches=[Match(wm_class=["firefox"])]),
-    Group("󰈮", matches=[Match(wm_class=["VSCodium", "geany"])]),
+    Group("󰈮", matches=[Match(wm_class=["VSCodium", "geany","Godot_Engine"])]),
     Group("", matches=[Match(wm_class=["Thunar"])]),
     Group("󰈬"),
     Group("", matches=[Match(wm_class=["krita", "Gcolor3", "obs"])]),
@@ -133,6 +134,8 @@ groups.append(ScratchPad("scratchpad", [
     DropDown("term", "alacritty --class=scratch", width=0.6, height=0.6, x=0.2, y=0.2, opacity=1),
     DropDown("term2", "alacritty --class=scratch", width=0.6, height=0.6, x=0.2, y=0.2, opacity=1),
     DropDown("ranger", "alacritty --class=ranger -e ranger", width=0.6, height=0.6, x=0.2, y=0.2, opacity=1),
+    DropDown("spotify-tui", "alacritty --class=spt -e spt", width=0.6, height=0.6, x=0.2, y=0.2, opacity=1),
+
     DropDown("notas", "alacritty --class=notas", width=0.3, height=0.4, opacity=1),
     DropDown("reloj", "alacritty --class=reloj", width=0.3, height=0.2, x=0.6, y=0.75, opacity=1),
 ]))
@@ -143,6 +146,7 @@ keys.extend((
   Key([mod], 'F1', lazy.group['scratchpad'].dropdown_toggle('term')),
   Key([mod], 'F2', lazy.group['scratchpad'].dropdown_toggle('term2')),
   Key([mod], 'F3', lazy.group['scratchpad'].dropdown_toggle('ranger')),
+  Key([mod], 'F4', lazy.group['scratchpad'].dropdown_toggle('spotify-tui')),
   Key([mod], 'F11', lazy.group['scratchpad'].dropdown_toggle('notas')),
   Key([mod], 'F12', lazy.group['scratchpad'].dropdown_toggle('reloj')),
 ))
@@ -208,7 +212,7 @@ screens = [
                 #widget.CurrentLayout(),
                 #widget.TextBox("", fontsize=22),
                 widget.GroupBox(inactive=bgColors["other"], highlight_method="line"),
-                widget.TextBox("", fontsize=22),
+                #widget.TextBox("", fontsize=22),
                 widget.Prompt(),
                 widget.Spacer(),
                 widget.CheckUpdates(distro="Arch_checkupdates", no_update_string="\[T]/", update_interval=10),
@@ -254,6 +258,8 @@ floating_layout = layout.Floating(
         Match(wm_class="ssh-askpass"),  # ssh-askpass
         Match(title="branchdialog"),  # gitk
         Match(title="pinentry"),  # GPG key password entry
+        Match(wm_class="Godot_Engine"),
+        #Match(wm_class="MyAssistant"),
     ]
 )
 auto_fullscreen = True
