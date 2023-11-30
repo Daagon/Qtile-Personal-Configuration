@@ -107,7 +107,7 @@ groups = [
     Group("", matches=[Match(wm_class=["firefox"])]),
     Group("󰈮", matches=[Match(wm_class=["VSCodium", "geany","Godot_Engine"])]),
     Group("", matches=[Match(wm_class=["Thunar"])]),
-    Group("󰈬"),
+    Group("󰈬", matches=[Match(wm_class=["libreoffice-calc", "libreoffice", "LibreOffice Calc", "LibreOffice-Calc", "libreoffice-startcenter", "libreoffice calc", "LibreOffice calc", "LibreOffice-calc"])]),
     Group("", matches=[Match(wm_class=["krita", "Gcolor3", "obs"])]),
     Group(""),
     Group("", matches=[Match(wm_class=["timeshift-gtk", "Nitrogen", "Lxappearance", "nvidia-settings", "pavucontrol"])]),
@@ -259,7 +259,7 @@ floating_layout = layout.Floating(
         Match(title="branchdialog"),  # gitk
         Match(title="pinentry"),  # GPG key password entry
         Match(wm_class="Godot_Engine"),
-        #Match(wm_class="MyAssistant"),
+        Match(wm_class="feh"),
     ]
 )
 auto_fullscreen = True
